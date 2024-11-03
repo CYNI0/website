@@ -10,12 +10,12 @@
   <div class="results-page">
     <div class="results-container">
       <h1 class="main-genre">Your main genre is...</h1>
-      <h2 id="genre-name" class="genre">Loading...</h2>
+      <h2 id="genres" class="genre">Loading...</h2>
 
       <div id="artist-container" class="artist-container" style="display: none;">
         <h3 class="artist-title">Your Top Artist:</h3>
-        <p id="artist-name" class="artist-name"></p>
-        <img id="artist-image" alt="Top Artist" class="artist-image" />
+        <p id="artistName" class="artist-name"></p>
+        <img id="artistImage" alt="Top Artist" class="artist-image" />
       </div>
 
       <h3 class="outfit-title">Here is your outfit!</h3>
@@ -27,58 +27,69 @@
   </div>
 
   <script>
-    document.addEventListener("DOMContentLoaded", async function() {
-        // Extract access token from URL
-        const hash = window.location.hash;
-        const accessToken = new URLSearchParams(hash.substring(1)).get("access_token");
-        console.log("Access Token:", accessToken);
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var clientId = "ceae01a497814f499f7aebd4830653cb"; // Replace with your actual client_id
+            var clientSecret = "7a87df79d2744e1ab3ef79e6f1488f8d"; // Replace with your actual client_secret
 
-        // Ensure the access token is present
-        if (!accessToken) {
-            console.error("Access token is missing.");
-            document.getElementById("genre-name").textContent = "Error: No access token.";
-            return;
-        }
-
-        // Function to fetch genre and top artist
-        async function fetchSpotifyData() {
-            try {
-                const response = await fetch("https://api.spotify.com/v1/me/top/artists?limit=1", {
-                    headers: { "Authorization": `Bearer ${accessToken}` }
+            // Function to get access token
+            function getAccessToken() {
+                return new Promise((resolve, reject) => {
+                    $.ajax({
+                        url: "https://accounts.spotify.com/api/token",
+                        type: "POST",
+                        headers: {
+                            "Authorization": "Basic " + btoa(clientId + ":" + clientSecret)
+                        },
+                        data: {
+                            "grant_type": "client_credentials"
+                        },
+                        success: function(response) {
+                            resolve(response.access_token);
+                        },
+                        error: function(xhr, status, error) {
+                            reject(error);
+                        }
+                    });
                 });
-
-                console.log("API Response Status:", response.status);
-
-                if (!response.ok) {
-                    const errorResponse = await response.json();
-                    console.error("Spotify API Error Response:", errorResponse);
-                    throw new Error(`Error ${response.status}: Unable to fetch data.`);
-                }
-
-                const data = await response.json();
-                console.log("Spotify API Response Data:", data);
-
-                const genre = data.items[0]?.genres[0]?.toUpperCase() || "Unknown Genre";
-                const artist = data.items[0]?.name || "Unknown Artist";
-                const artistImageUrl = data.items[0]?.images[0]?.url || 'outfit-placeholder.png';
-
-                document.getElementById("genre-name").textContent = genre;
-                document.getElementById("artist-name").textContent = artist;
-                document.getElementById("artist-image").src = artistImageUrl;
-
-                if (data.items && data.items.length > 0) {
-                    document.getElementById("artist-container").style.display = "block";
-                }
-            } catch (error) {
-                console.error("Error fetching data from Spotify API:", error);
-                document.getElementById("genre-name").textContent = "Error fetching data.";
             }
-        }
 
-        await fetchSpotifyData();
+            // Function to fetch user's top artist and main genre
+            function fetchUser TopArtistAndGenre(accessToken) {
+                $.ajax({
+                    url: "https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=1",
+                    type: "GET",
+                    headers: {
+                        "Authorization": "Bearer " + accessToken
+                    },
+                    success: function(response) {
+                        if (response.items.length > 0) {
+                            const topArtist = response.items[0];
+                            const artistName = topArtist.name;
+                            const genres = topArtist.genres;
+                            const artistImage = topArtist.images.length > 0 ? topArtist.images[0].url : null;
+                            // Display the top artist and main genre
+                            const mainGenre = genres.length > 0 ? genres[0] : "No genre available";
+                            $('#results').html(`<h2>Your Top Artist: ${artistName}</h2><h3>Main Genre: ${mainGenre}</h3>`);
+                        } else {
+                            $('#results').html("<h2>No top artist found.</h2>");
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log(error);
+                    }
+                });
+            }
+
+            // Fetch and display the top artist and genre on page load
+            getAccessToken().then(accessToken => {
+                fetchUser TopArtistAndGenre(accessToken);
+            }).catch(error => {
+                console.error("Error fetching access token:", error);
+            });
 
 
-    });
+        });
   </script>
 </body>
 </html>
