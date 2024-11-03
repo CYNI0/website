@@ -16,7 +16,7 @@
         <div>OUTFIT</div>
       </h1>
       <p class="subtitle">Your Outfit, Inspired by Your Music Taste</p>
-      <a href="javascript:void(0);" onclick="requestAuthorization()" class="connect-button">
+      <a href="javascript:void(0);" onclick="connectSpotify()" class="connect-button">
         <img src="spotify-logo.png" alt="Spotify Logo" class="spotify-logo">
         Connect Spotify
       </a>
@@ -35,20 +35,75 @@
   </div>
 
   <script>
+    const CLIENT_ID = "ceae01a497814f499f7aebd4830653cb";
+    const REDIRECT_URI = "https://cyni0.github.io/website/results.html";
+    const SCOPES = "user-read-private user-top-read user-read-email user-read-recently-played user-read-playback-state user-read-currently-playing";
 
-    var redirect_uri = "https://cyni0.github.io/website/results.html";  // change this your value
-//var redirect_uri = "http://127.0.0.1:5500/index.html";
+    function connectSpotify() {
+      const loginUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=token&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${encodeURIComponent(SCOPES)}`;
+      window.location.href = loginUrl;
+    }
 
-var client_id = "ceae01a497814f499f7aebd4830653cb"; 
+    // Function to extract access token from URL
+    function getAccessTokenFromURL() {
+      const hash = window.location.hash.substring(1);
+      const params = new URLSearchParams(hash);
+      return params.get("access_token");
+    }
 
-    let url = AUTHORIZE;
-    url += "?client_id=" + client_id;
-    url += "&response_type=code";
-    url += "&redirect_uri=" + encodeURI(redirect_uri);
-    url += "&show_dialog=true";
-    url += "&scope=user-read-private user-read-email user-modify-playback-state user-read-playback-position user-library-read streaming user-read-playback-state user-read-recently-played playlist-read-private user-top-read";
-    window.location.href = url; // Show Spotify's authorization screen
-}
+    // Fetch user's top artist data from Spotify
+    function fetchSpotifyData(accessToken) {
+      fetch("https://api.spotify.com/v1/me/top/artists?limit=1&time_range=short_term", {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Error ${response.status}: Unable to fetch data.`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.items && data.items.length > 0) {
+          const topArtist = data.items[0];
+          const topGenre = topArtist.genres[0] ? topArtist.genres[0].toUpperCase() : 'No genre available';
+          const artistImageUrl = topArtist.images[0]?.url || 'outfit-placeholder.png';
+
+          // Update results page with fetched data
+          document.getElementById("genre-name").textContent = topGenre;
+          document.getElementById("artist-name").textContent = topArtist.name;
+          document.getElementById("artist-image").src = artistImageUrl;
+
+          // Show results page and hide landing page
+          document.getElementById("landing-page").style.display = "none";
+          document.getElementById("results-page").style.display = "block";
+        } else {
+          document.getElementById("genre-name").textContent = 'No top artists found';
+        }
+      })
+      .catch(error => {
+        console.error("Error fetching data:", error);
+        document.getElementById("genre-name").textContent = 'Error fetching data';
+      });
+    }
+
+    // On page load, check for access token in URL or session storage
+    window.addEventListener("load", function() {
+      const accessToken = getAccessTokenFromURL();
+      if (accessToken) {
+        // Clear the token from the URL and store it in sessionStorage
+        window.location.hash = '';
+        sessionStorage.setItem('accessToken', accessToken);
+        fetchSpotifyData(accessToken);
+      } else {
+        // Check if access token is stored in sessionStorage
+        const savedToken = sessionStorage.getItem('accessToken');
+        if (savedToken) {
+          fetchSpotifyData(savedToken);
+        }
+      }
+    });
   </script>
 </body>
 </html>
