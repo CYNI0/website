@@ -1,15 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+<head style="background-color: #061e3e;">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Spotify Outfit - Landing Page</title>
   <link rel="stylesheet" href="LandingPage.css">
 </head>
 <body style="background-color: #061e3e;">
-  <div class="landing-page">
+  <!-- Landing Page Section -->
+  <div id="landing-page" class="landing-page">
     <div class="container">
-      <h1 class="title">Your Spotify Outfit</h1>
+      <h1 class="title">
+        <div>YOUR</div>
+        <div>SPOTIFY</div>
+        <div>OUTFIT</div>
+      </h1>
       <p class="subtitle">Your Outfit, Inspired by Your Music Taste</p>
       <a href="javascript:void(0);" onclick="connectSpotify()" class="connect-button">
         <img src="spotify-logo.png" alt="Spotify Logo" class="spotify-logo">
@@ -18,15 +23,87 @@
     </div>
   </div>
 
+  <!-- Results Page Section (Initially Hidden) -->
+  <div id="results-page" class="results-page" style="display: none;">
+    <div class="container">
+      <h2>Your Top Genre:</h2>
+      <p id="genre-name">Loading...</p>
+      <h3>Your Top Artist:</h3>
+      <p id="artist-name"></p>
+      <img id="artist-image" src="outfit-placeholder.png" alt="Top Artist Image" class="artist-image">
+    </div>
+  </div>
+
   <script>
-    const CLIENT_ID = "ceae01a497814f499f7aebd4830653cb"; // Replace with your actual Client ID
-    const REDIRECT_URI = "https://cyni0.github.io/website/results.html"; // Ensure this URI matches in Spotify Developer Dashboard
-    const SCOPES = "user-read-private, user-top-read, user-read-email";
+    const CLIENT_ID = "ceae01a497814f499f7aebd4830653cb";
+    const REDIRECT_URI = "https://cyni0.github.io/website/results.html";
+    const SCOPES = "user-read-private user-top-read user-read-email user-read-recently-played user-read-playback-state user-read-currently-playing";
 
     function connectSpotify() {
-      const authUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=token&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${encodeURIComponent(SCOPES)}`;
-      window.location.href = authUrl;
+      const loginUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=token&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${encodeURIComponent(SCOPES)}`;
+      window.location.href = loginUrl;
     }
+
+    // Function to extract access token from URL
+    function getAccessTokenFromURL() {
+      const hash = window.location.hash.substring(1);
+      const params = new URLSearchParams(hash);
+      return params.get("access_token");
+    }
+
+    // Fetch user's top artist data from Spotify
+    function fetchSpotifyData(accessToken) {
+      fetch("https://api.spotify.com/v1/me/top/artists?limit=1&time_range=short_term", {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Error ${response.status}: Unable to fetch data.`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.items && data.items.length > 0) {
+          const topArtist = data.items[0];
+          const topGenre = topArtist.genres[0] ? topArtist.genres[0].toUpperCase() : 'No genre available';
+          const artistImageUrl = topArtist.images[0]?.url || 'outfit-placeholder.png';
+
+          // Update results page with fetched data
+          document.getElementById("genre-name").textContent = topGenre;
+          document.getElementById("artist-name").textContent = topArtist.name;
+          document.getElementById("artist-image").src = artistImageUrl;
+
+          // Show results page and hide landing page
+          document.getElementById("landing-page").style.display = "none";
+          document.getElementById("results-page").style.display = "block";
+        } else {
+          document.getElementById("genre-name").textContent = 'No top artists found';
+        }
+      })
+      .catch(error => {
+        console.error("Error fetching data:", error);
+        document.getElementById("genre-name").textContent = 'Error fetching data';
+      });
+    }
+
+    // On page load, check for access token in URL or session storage
+    window.addEventListener("load", function() {
+      const accessToken = getAccessTokenFromURL();
+      if (accessToken) {
+        // Clear the token from the URL and store it in sessionStorage
+        window.location.hash = '';
+        sessionStorage.setItem('accessToken', accessToken);
+        fetchSpotifyData(accessToken);
+      } else {
+        // Check if access token is stored in sessionStorage
+        const savedToken = sessionStorage.getItem('accessToken');
+        if (savedToken) {
+          fetchSpotifyData(savedToken);
+        }
+      }
+    });
   </script>
 </body>
 </html>
