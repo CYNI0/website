@@ -35,8 +35,10 @@
             headers: {
                 "Authorization": "Basic " + btoa(`${clientId}:${clientSecret}`)
             },
-            data: {
-                grant_type: "client_credentials"
+                data: {
+                grant_type: "authorization_code",
+                code: code,
+                redirect_uri: redirectUri
             },
             success: function(response) {
                 console.log("Access Token Response:", response);
