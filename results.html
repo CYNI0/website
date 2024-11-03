@@ -41,7 +41,7 @@
             },
             success: function(response) {
                 const accessToken = response.access_token;
-                fetchUser TopArtistAndGenre(accessToken); // Corrected function name
+                fetchUserTopArtistAndGenre(accessToken); // Corrected function name
             },
             error: function(xhr, status, error) {
                 console.error("Error exchanging code for token:", error);
