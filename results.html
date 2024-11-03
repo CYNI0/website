@@ -9,10 +9,16 @@
 <body >
   <div class="results-page">
     <div class="results-container">
-      <h1 class="main-genre">Your main genre is...</h1>
-      <h2 class="genre">Goth</h2> <!-- Replace "Goth" dynamically if needed -->
-      <h3 class="outfit-title">Here is your outfit!</h3>
-      <img src="outfit-placeholder.png" alt="Outfit" class="outfit-image">
+      <h1 className="main-genre">Your main genre is...</h1>
+      <h2 className="genre">{genre}</h2>
+      {artistImage && (
+          <div className="artist-container">
+              <h3 className="artist-title">Your Top Artist:</h3>
+              <img src={artistImage} alt="Top Artist" className="artist-image" />
+          </div>
+      )}
+      <h3 className="outfit-title">Here is your outfit!</h3>
+      <img src={outfitImage} alt="Outfit" className="outfit-image" />
     </div>
   </div>
   <script src="ResultsPage.js"></script>
