@@ -16,7 +16,7 @@
         <div>OUTFIT</div>
       </h1>
       <p class="subtitle">Your Outfit, Inspired by Your Music Taste</p>
-      <a href="javascript:void(0);" onclick="connectSpotify()" class="connect-button">
+      <a href="javascript:void(0);" onclick="requestAuthorization()" class="connect-button">
         <img src="spotify-logo.png" alt="Spotify Logo" class="spotify-logo">
         Connect Spotify
       </a>
@@ -40,18 +40,40 @@
     const REDIRECT_URI = "https://cyni0.github.io/website/results.html";
     const SCOPES = "user-read-private user-top-read user-read-email user-read-recently-played user-read-playback-state user-read-currently-playing";
 
-    function connectSpotify() {
-      const loginUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=token&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${encodeURIComponent(SCOPES)}`;
-      window.location.href = loginUrl;
+    function requestAuthorization(){
+      let url = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${encodeURIComponent(SCOPES)}`;
+      window.location.href = url; // Show Spotify's authorization screen
     }
 
-    // Function to extract access token from URL
-    function getAccessTokenFromURL() {
-      const hash = window.location.hash.substring(1);
-      const params = new URLSearchParams(hash);
-      return params.get("access_token");
+    // Function to extract the code from the URL
+    function getCodeFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("code");
     }
 
+    // Fetch access token using the authorization code
+    function fetchAccessToken(code){
+      let body = `grant_type=authorization_code&code=${code}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}`;
+      callAuthorizationApi(body);
+    }
+
+    function callAuthorizationApi(body){
+      let xhr = new XMLHttpRequest();
+      xhr.open("POST", "https://accounts.spotify.com/api/token", true);
+      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+      xhr.send(body);
+      xhr.onload = handleAuthorizationResponse;
+    }
+
+    function handleAuthorizationResponse() {
+      if (this.status === 200) {
+        const response = JSON.parse(this.responseText);
+        const accessToken = response.access_token;
+        fetchSpotifyData(accessToken);
+      } else {
+        console.error("Error fetching access token:", this.responseText);
+      }
+    }
     // Fetch user's top artist data from Spotify
     function fetchSpotifyData(accessToken) {
       fetch("https://api.spotify.com/v1/me/top/artists?limit=1&time_range=short_term", {
