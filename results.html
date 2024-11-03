@@ -5,18 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Spotify Outfit - Results Page</title>
   <link rel="stylesheet" href="ResultsPage.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
   <div class="results-page">
-    <div class="results-container">
-      <h1 class="main-genre">Your main genre is...</h1>
-      <h2 id="genres" class="genre">Loading...</h2>
-
-      <div id="artist-container" class="artist-container" style="display: none;">
-        <h3 class="artist-title">Your Top Artist:</h3>
-        <p id="artistName" class="artist-name"></p>
-        <img id="artistImage" alt="Top Artist" class="artist-image" />
-      </div>
 
       <h3 class="outfit-title">Here is your outfit!</h3>
       <img id="outfit-image" src="outfit-placeholder.png" alt="Outfit" class="outfit-image" />
@@ -63,16 +55,33 @@
                         "Authorization": "Bearer " + accessToken
                     },
                     success: function(response) {
+                        const mainGenreElement = $('#genre-name');
+                        const artistContainer = $('#artist-container');
+                        const artistNameElement = $('#artist-name');
+                        const artistImageElement = $('#artist-image');
+
                         if (response.items.length > 0) {
                             const topArtist = response.items[0];
-                            const artistName = topArtist.name;
                             const genres = topArtist.genres;
+                            const artistName = topArtist.name;
                             const artistImage = topArtist.images.length > 0 ? topArtist.images[0].url : null;
-                            // Display the top artist and main genre
+
+                            // Display the main genre
                             const mainGenre = genres.length > 0 ? genres[0] : "No genre available";
-                            $('#results').html(`<h2>Your Top Artist: ${artistName}</h2><h3>Main Genre: ${mainGenre}</h3>`);
+                            mainGenreElement.text(mainGenre);
+
+                            // Display the artist details
+                            artistNameElement.text(artistName);
+                            if (artistImage) {
+                                artistImageElement.attr('src', artistImage);
+                                artistImageElement.show();
+                            } else {
+                                artistImageElement.hide();
+                            }
+                            artistContainer.show();
                         } else {
-                            $('#results').html("<h2>No top artist found.</h2>");
+                            mainGenreElement.text("No genre available.");
+                            artistContainer.hide();
                         }
                     },
                     error: function(xhr, status, error) {
@@ -88,8 +97,31 @@
                 console.error("Error fetching access token:", error);
             });
 
-
+            $("#logout-button").click(function() {
+                sessionStorage.removeItem('searchResults');
+                sessionStorage.removeItem('selectedMood');
+                window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
+            });
         });
-  </script>
+    </script>
+</head>
+<body>
+    <div class="header-container">
+        <h1>MoodSwinger</h1>
+        <button id="logout-button">Logout</button>
+    </div>
+
+    <div class="results-page">
+        <div class="results-container">
+            <h1 class="main-genre">Your main genre is...</h1>
+            <h2 id="genre-name" class="genre">Loading...</h2>
+
+            <div id="artist-container" class="artist-container" style="display: none;">
+                <h3 class="artist-title">Your Top Artist:</h3>
+                <p id="artist-name" class="artist-name"></p>
+                <img id="artist-image" alt="Top Artist" class="artist-image" style="width: 200px; height: auto; border-radius: 10px;" />
+            </div>
+        </div>
+    </div>
 </body>
 </html>
