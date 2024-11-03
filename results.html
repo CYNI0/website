@@ -49,7 +49,7 @@
         });
     }
 
-    function fetchUser TopArtistAndGenre(accessToken) {
+    function fetchUserTopArtistAndGenre(accessToken) {
         $.ajax({
             url: "https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=1",
             type: "GET",
