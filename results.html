@@ -29,7 +29,15 @@
         const hash = window.location.hash;
         const accessToken = new URLSearchParams(hash.substring(1)).get("access_token");
         console.log("Access Token:", accessToken);
-
+         $.ajax({
+                    url: "https://accounts.spotify.com/api/token",
+                    type: "POST",
+                    headers: {
+                        "Authorization": "Basic " + btoa(CLIENT_ID + ":" + CLIENT_SECRET)
+                    },
+                    data: {
+                        "grant_type": "client_credentials"
+         });
         // Ensure the access token is present
         if (!accessToken) {
             console.error("Access token is missing.");
