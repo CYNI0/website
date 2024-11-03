@@ -100,16 +100,12 @@
             $("#logout-button").click(function() {
                 sessionStorage.removeItem('searchResults');
                 sessionStorage.removeItem('selectedMood');
-                window.location.href = "https://scripteds.github.io/MoodSwinger/index.html";
+                window.location.href = "https://cyni0.github.io/website/";
             });
         });
     </script>
 </head>
 <body>
-    <div class="header-container">
-        <h1>MoodSwinger</h1>
-        <button id="logout-button">Logout</button>
-    </div>
 
     <div class="results-page">
         <div class="results-container">
@@ -121,6 +117,8 @@
                 <p id="artist-name" class="artist-name"></p>
                 <img id="artist-image" alt="Top Artist" class="artist-image" style="width: 200px; height: auto; border-radius: 10px;" />
             </div>
+                <h3 class="outfit-title">Here is your outfit!</h3>
+      <img id="outfit-image" src="outfit-placeholder.png" alt="Outfit" class="outfit-image" />
         </div>
     </div>
 </body>
