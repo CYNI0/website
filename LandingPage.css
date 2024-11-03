@@ -1,0 +1,63 @@
+.landing-page {
+    background-image: url('mock-up.png');
+    background-size: cover;
+    background-position: center;
+    height: 100vh; /* Full viewport height */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    background: linear-gradient(to bottom, rgba(91, 132, 186, 255), rgba(144, 224, 255, 0.8)); /* Sky background */
+    border-radius: 20px; /* Rounded corners */
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    display: flex; /* Use Flexbox */
+    flex-direction: column; /* Stack children vertically */
+    align-items: center; /* Center children horizontally */
+}
+
+.title {
+    color: #fff4bd; /* Title color */
+    font-family: cursive;
+    font-size: 4rem; /* Font size */
+}
+
+.title div {
+    margin: 0; /* Remove margin for each word */
+    line-height: 1.5; /* Adjust line height for spacing between words */
+}
+
+.subtitle {
+    color: #335272; 
+    font-family: cursive;
+    font-size: 1.2rem; /* Font size */
+    margin: 0 0 20px; /* Margin below subtitle */
+}
+
+.connect-button {
+    display: flex;
+    align-items: center;
+    background-color: #ffffff; /* Spotify green */
+    font-family: cursive;
+    color: rgb(0, 0, 0);
+    border: none;
+    border-radius: 25px; /* Rounded button */
+    padding: 10px 20px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 20px; /* Add margin above the button for spacing */
+}
+
+.connect-button:hover {
+    background-color: #1aa34a; /* Darker green on hover */
+}
+
+.spotify-logo {
+    width: 24px; /* Adjust logo size */
+    height: 24px; /* Adjust logo size */
+    margin-right: 10px; /* Space between logo and text */
+}

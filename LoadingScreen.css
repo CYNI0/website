@@ -1,0 +1,27 @@
+.loading-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #061e3e;
+    color: #ffffff; /* Default text color */
+    font-family: 'Poppins', sans-serif; /* Font family */
+    transition: background-color 1s ease; /* Smooth transition for background color */
+}
+
+.loading-line {
+    font-size: 1.75em; /* Font size */
+    opacity: 0; /* Start invisible */
+    transition: opacity 1s ease, transform 0.3s ease; /* Smooth transition for opacity and scale */
+}
+
+.fade-in {
+    opacity: 1; /* Fully visible */
+    transform: scale(1.3); /* Slightly scale the current message */
+}
+
+.fade-out {
+    opacity: 0.1; /* Fade out */
+    transform: scale(1); /* Reset scale */
+}

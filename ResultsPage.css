@@ -1,0 +1,42 @@
+.results-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #061e3e; /* Dark background color */
+}
+
+.results-container {
+    background-color: white; /* White container for results */
+    padding: 20px; /* Padding inside the container */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+    text-align: center; /* Center text */
+    max-width: 400px; /* Max width for the container */
+    width: 100%; /* Full width on smaller screens */
+}
+
+.main-genre {
+    font-size: 1.5em; /* Font size for main genre text */
+    font-family: cursive;
+    margin: 0; /* Remove default margin */
+}
+
+.genre {
+    font-size: 3em; /* Larger font size for the derived genre */
+    font-family: cursive;
+    color: #333; /* Darker color for contrast */
+    margin: 10px 0; /* Margin for spacing */
+}
+
+.outfit-title {
+    font-size: 1.5em; /* Font size for outfit title */
+    font-family: cursive;
+    margin: 20px 0 10px; /* Margin for spacing */
+}
+
+.outfit-image {
+    max-width: 80%; /* Responsive image */
+    height: auto; /* Maintain aspect ratio */
+    border-radius: 8px; /* Rounded corners for the image */
+}
