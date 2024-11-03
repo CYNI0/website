@@ -42,51 +42,73 @@
             redirect_uri: redirectUri
         },
         //changed code
-          success: function(response) {
+     success: function(response) {
             console.log("Access Token Response:", response);
             const accessToken = response.access_token;
-            fetchUserTopGenre(accessToken);
-          },
-          error: function(xhr, status, error) {
+            fetchUserTopArtistAndGenre(accessToken);
+        },
+        error: function(xhr, status, error) {
             console.error("Error exchanging code for token:", xhr.responseText || error);
-          }
-        });
-      }
-
-      function fetchUserTopGenre(accessToken) {
-        $.ajax({
-          url: "https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=1",
-          type: "GET",
-          headers: {
-            "Authorization": "Bearer " + accessToken
-          },
-          success: function(response) {
-            console.log("API Response:", response);
-            const mainGenreElement = $('#mainGenre');
-
-            if (response.items.length > 0) {
-              const topArtist = response.items[0];
-              const genres = topArtist.genres;
-              const mainGenre = genres.length > 0 ? genres[0] : "No genre available";
-              mainGenreElement.text(mainGenre);
-            } else {
-              mainGenreElement.text("No genre available.");
-            }
-          },
-          error: function(xhr, status, error) {
-            console.error("Error fetching genre data:", xhr.responseText || error);
-          }
-        });
-      }
+        }
     });
-  </script>
+}
+    function fetchUserTopArtistAndGenre(accessToken) {
+        $.ajax({
+            url: "https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=1",
+            type: "GET",
+            headers: {
+                "Authorization": "Bearer " + accessToken
+            },
+            success: function(response) {
+                console.log("API Response:", response);
+                const mainGenreElement = $('#mainGenre');
+                const artistContainer = $('#artist-container');
+                const artistNameElement = $('#artistName');
+                const artistImageElement = $('#artistImage');
+
+                if (response.items.length > 0) {
+                    const topArtist = response.items[0];
+                    const genres = topArtist.genres;
+                    const artistName = topArtist.name;
+                    const artistImage = topArtist.images.length > 0 ? topArtist.images[0].url : null;
+
+                    const mainGenre = genres.length > 0 ? genres[0] : "No genre available";
+                    mainGenreElement.text(mainGenre);
+                    artistNameElement.text(artistName);
+                    if (artistImage) {
+                        artistImageElement.attr('src', artistImage).show();
+                    } else {
+                        artistImageElement.hide();
+                    }
+                    artistContainer.show();
+                } else {
+                    mainGenreElement.text("No genre available.");
+                    artistContainer.hide();
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Error fetching artist data:", xhr.responseText || error);
+            }
+        });
+    }
+});
+</script>
 </head>
 <body>
-  <div class="results-page">
-    <div class="results-container">
-      <h1 class="main-genre">Your main genre is...</h1>
-      <h2 id="mainGenre" class="genre">Loading...</h2>
+
+    <div class="results-page">
+        <div class="results-container">
+            <h1 class="main-genre">Your main genre is...</h1>
+            <h2 id="mainGenre" class="genre">Loading...</h2>
+
+            <div id="artist-container" class="artist-container" style="display: none;">
+                <h3 class="artist-title">Your Top Artist:</h3>
+                <p id="artistName" class="artist-name"></p>
+                <img id="artistImage" alt="Top Artist" class="artist-image" style="width: 200px; height: auto; border-radius: 10px;" />
+            </div>
+        <h3 class="outfit-title">Here is your outfit!</h3>
+      <img id="outfit-image" src="outfit-placeholder.png" alt="Outfit" class="outfit-image" />
+        </div>
     </div>
-  </div>
 </body>
 </html>
