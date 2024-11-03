@@ -24,7 +24,7 @@
 
     function redirectToSpotifyAuth() {
         const scopes = "user-top-read";
-        const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes)}`;
+        const authUrl = "https://accounts.spotify.com/authorize?client_id=ceae01a497814f499f7aebd4830653cb&response_type=token&redirect_uri=https://cyni0.github.io/website/results.html&scope=user-read-private,user-top-read,user-read-email,user-read-recently-played,user-read-playback-state,user-read-currently-playing&state=STATE&show_dialog=true";
         window.location.href = authUrl;
     }
 
