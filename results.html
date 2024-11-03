@@ -41,7 +41,7 @@
             },
             success: function(response) {
                 const accessToken = response.access_token;
-                fetchUser TopArtistAndGenre(accessToken); 
+                fetchUser TopArtistAndGenre(accessToken); // Corrected function name
             },
             error: function(xhr, status, error) {
                 console.error("Error exchanging code for token:", error);
@@ -50,7 +50,7 @@
     }
 
     function fetchUser TopArtistAndGenre(accessToken) {
- $.ajax({
+        $.ajax({
             url: "https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=1",
             type: "GET",
             headers: {
@@ -58,7 +58,34 @@
             },
             success: function(response) {
                 console.log("API Response:", response);
-                // Process the response data
+                const mainGenreElement = $('#genre-name');
+                const artistContainer = $('#artist-container');
+                const artistNameElement = $('#artist-name');
+                const artistImageElement = $('#artist-image');
+
+                if (response.items.length > 0) {
+                    const topArtist = response.items[0];
+                    const genres = topArtist.genres;
+                    const artistName = topArtist.name;
+                    const artistImage = topArtist.images.length > 0 ? topArtist.images[0].url : null;
+
+                    // Display the main genre
+                    const mainGenre = genres.length > 0 ? genres[0] : "No genre available";
+                    mainGenreElement.text(mainGenre);
+
+                    // Display the artist details
+                    artistNameElement.text(artistName);
+                    if (artistImage) {
+                        artistImageElement.attr('src', artistImage);
+                        artistImageElement.show();
+                    } else {
+                        artistImageElement.hide();
+                    }
+                    artistContainer.show();
+                } else {
+                    mainGenreElement.text("No genre available.");
+                    artistContainer.hide();
+                }
             },
             error: function(xhr, status, error) {
                 console.error("Error fetching artist data:", error);
