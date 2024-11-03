@@ -12,20 +12,7 @@
     var clientSecret = "7a87df79d2744e1ab3ef79e6f1488f8d"; // Replace with your actual client_secret
     const redirectUri = "cyni0.github.io/website/results.html"; 
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const authCode = urlParams.get('code');
 
-    if (authCode) {
-        exchangeCodeForToken(authCode);
-    } else {
-        redirectToSpotifyAuth();
-    }
-
-    function redirectToSpotifyAuth() {
-        const scopes = "user-top-read"; 
-        const authUrl = "https://accounts.spotify.com/authorize?client_id=ceae01a497814f499f7aebd4830653cb&response_type=token&redirect_uri=https://cyni0.github.io/website/results.html&scope=user-read-private,user-top-read,user-read-email,user-read-recently-played,user-read-playback-state,user-read-currently-playing&state=STATE&show_dialog=true";
-        window.location.href = authUrl; 
-    }
 
     function exchangeCodeForToken(code) {
         $.ajax({
