@@ -31,7 +31,7 @@ function App() {
                 // If access token is present, store it in sessionStorage
                 sessionStorage.setItem('accessToken', accessToken);
                 // Redirect to the main page or perform other actions
-                window.location.href = "https://cyni0.github.io/website/results-page.js;
+                window.location.href = "https://cyni0.github.io/website/results.html;
             }
         });
 
