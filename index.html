@@ -52,58 +52,30 @@
     }
 
     // Fetch user's top artist data from Spotify
-    function fetchSpotifyData(accessToken) {
-      fetch("https://api.spotify.com/v1/me/top/artists?limit=1&time_range=short_term", {
-        headers: {
-          Authorization: `Bearer ${accessToken}`
+        function getAccessTokenFromURL() {
+            var accessToken = null;
+            var hash = window.location.hash.substring(1);
+            var params = hash.split('&');
+            for (var i = 0; i < params.length; i++) {
+                var param = params[i].split('=');
+                if (param[0] === 'access_token') {
+                    accessToken = param[1];
+                    break;
+                }
+            }
+            return accessToken;
         }
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`Error ${response.status}: Unable to fetch data.`);
-        }
-        return response.json();
-      })
-      .then(data => {
-        if (data.items && data.items.length > 0) {
-          const topArtist = data.items[0];
-          const topGenre = topArtist.genres[0] ? topArtist.genres[0].toUpperCase() : 'No genre available';
-          const artistImageUrl = topArtist.images[0]?.url || 'outfit-placeholder.png';
-
-          // Update results page with fetched data
-          document.getElementById("genre-name").textContent = topGenre;
-          document.getElementById("artist-name").textContent = topArtist.name;
-          document.getElementById("artist-image").src = artistImageUrl;
-
-          // Show results page and hide landing page
-          document.getElementById("landing-page").style.display = "none";
-          document.getElementById("results-page").style.display = "block";
-        } else {
-          document.getElementById("genre-name").textContent = 'No top artists found';
-        }
-      })
-      .catch(error => {
-        console.error("Error fetching data:", error);
-        document.getElementById("genre-name").textContent = 'Error fetching data';
-      });
-    }
-
-    // On page load, check for access token in URL or session storage
-    window.addEventListener("load", function() {
-      const accessToken = getAccessTokenFromURL();
-      if (accessToken) {
-        // Clear the token from the URL and store it in sessionStorage
-        window.location.hash = '';
-        sessionStorage.setItem('accessToken', accessToken);
-        fetchSpotifyData(accessToken);
-      } else {
-        // Check if access token is stored in sessionStorage
-        const savedToken = sessionStorage.getItem('accessToken');
-        if (savedToken) {
-          fetchSpotifyData(savedToken);
-        }
-      }
-    });
+        // Check if the URL contains an access token
+        window.addEventListener("load", function() {
+            var accessToken = getAccessTokenFromURL();
+            if (accessToken) {
+                // If access token is present, store it in sessionStorage
+                sessionStorage.setItem('accessToken', accessToken);
+                // Redirect to the main page or perform other actions
+                window.location.href = "https://cyni0.github.io/website/results.html";
+            }
+        });
+   
   </script>
 </body>
 </html>
