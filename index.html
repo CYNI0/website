@@ -36,6 +36,19 @@
 
   <script>
 
+    var redirect_uri = "https://cyni0.github.io/website/results.html";  // change this your value
+//var redirect_uri = "http://127.0.0.1:5500/index.html";
+
+var client_id = "ceae01a497814f499f7aebd4830653cb"; 
+
+    let url = AUTHORIZE;
+    url += "?client_id=" + client_id;
+    url += "&response_type=code";
+    url += "&redirect_uri=" + encodeURI(redirect_uri);
+    url += "&show_dialog=true";
+    url += "&scope=user-read-private user-read-email user-modify-playback-state user-read-playback-position user-library-read streaming user-read-playback-state user-read-recently-played playlist-read-private user-top-read";
+    window.location.href = url; // Show Spotify's authorization screen
+}
   </script>
 </body>
 </html>
