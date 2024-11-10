@@ -6,13 +6,108 @@
   <title>Spotify Outfit - Results Page</title>
   <link rel="stylesheet" href="ResultsPage.css">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      var clientId = 'ceae01a497814f499f7aebd4830653cb'; // Replace with your actual client_id
+      var clientSecret = '7a87df79d2744e1ab3ef79e6f1488f8d'; // Replace with your actual client_secret
+      const redirectUri = "https://cyni0.github.io/website/results.html";
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const authCode = urlParams.get('code');
+      console.log("Auth Code:", authCode); // Check if the code is present
+
+      if (authCode) {
+          exchangeCodeForToken(authCode);
+      } else {
+          redirectToSpotifyAuth();
+      }
+
+      function redirectToSpotifyAuth() {
+          const scopes ='user-read-private user-read-email user-read-playback-state user-modify-playback-state user-read-recently-played user-top-read';
+          const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes)}`;
+          window.location.href = authUrl;
+      }
+
+      function exchangeCodeForToken(code) {
+        $.ajax({
+          url: "https://accounts.spotify.com/api/token",
+          type: "POST",
+          headers: {
+              "Authorization": "Basic " + btoa(clientId + ':' + clientSecret),
+              'Content-Type' : 'application/x-www-form-urlencoded'
+          },
+          data: {
+              grant_type: "authorization_code",
+              code: code,
+              redirect_uri: redirectUri
+          },
+          success: function(response) {
+              console.log("Access Token Response:", response);
+              const accessToken = response.access_token;
+              fetchUserTopArtistAndGenre(accessToken);
+          },
+          error: function(xhr, status, error) {
+              console.error("Error exchanging code for token:", xhr.responseText || error);
+          }
+        });
+      }
+
+      function fetchUserTopArtistAndGenre(accessToken) {
+        $.ajax({
+            url: "https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=1",
+            type: "GET",
+            headers: {
+                "Authorization": "Bearer " + accessToken
+            },
+            success: function(response) {
+                console.log("API Response:", response);
+                const mainGenreElement = $('#mainGenre');
+                const artistContainer = $('#artist-container');
+                const artistNameElement = $('#artistName');
+                const artistImageElement = $('#artistImage');
+
+                if (response.items.length > 0) {
+                    const topArtist = response.items[0];
+                    const genres = topArtist.genres;
+                    const artistName = topArtist.name;
+                    const artistImage = topArtist.images.length > 0 ? topArtist.images[0].url : null;
+
+                    const mainGenre = genres.length > 0 ? genres[0] : "No genre available";
+                    mainGenreElement.text(mainGenre);
+                    artistNameElement.text(artistName);
+                    if (artistImage) {
+                        artistImageElement.attr('src', artistImage).show();
+                    } else {
+                        artistImageElement.hide();
+                    }
+                    artistContainer.show();
+                } else {
+                    mainGenreElement.text("No genre available.");
+                    artistContainer.hide();
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Error fetching artist data:", xhr.responseText || error);
+            }
+        });
+      }
+
+      // Logout button functionality
+      $(document).on("click", "#logout-button", function() {
+        sessionStorage.removeItem("accessToken");
+        sessionStorage.removeItem("selectedMood");
+        sessionStorage.removeItem("searchResults");
+        window.location.href = "https://cyni0.github.io/website/index.html";
+      });
+    });
+  </script>
 </head>
 <body>
-
   <div class="results-page">
     <div class="results-container">
       <h1 class="main-genre">Your main genre is...</h1>
       <h2 id="mainGenre" class="genre">Loading...</h2>
+
       <div id="artist-container" class="artist-container" style="display: none;">
         <h3 class="artist-title">Your Top Artist:</h3>
         <p id="artistName" class="artist-name"></p>
@@ -23,23 +118,7 @@
     </div>
   </div>
 
-  <!-- Logout Button -->
-  <button id="logout-button" class="logout-button">Logout</button>
-
-  <script>
-    $(document).ready(function() {
-      // Logout button functionality
-      $("#logout-button").click(function() {
-        // Remove any stored items you need to clear
-        sessionStorage.removeItem("accessToken");
-       
-
-        // Redirect to the main page or login page
-        window.location.href = "https://cyni0.github.io/website/index.html";
-      });
-
-      // Other initialization code can go here if needed
-    });
-  </script>
+  <!-- Logout Button at Bottom Right -->
+  <button id="logout-button" style="position: fixed; bottom: 10px; right: 10px; padding: 10px 20px; background-color: #ff5252; color: white; border: none; border-radius: 5px; cursor: pointer;">Logout</button>
 </body>
 </html>
