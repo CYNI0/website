@@ -35,7 +35,6 @@
 
       const urlParams = new URLSearchParams(window.location.search);
       const authCode = urlParams.get('code');
-      console.log("Auth Code:", authCode); // Check if the code is present
 
       if (authCode) {
         exchangeCodeForToken(authCode);
@@ -63,9 +62,8 @@
             redirect_uri: redirectUri
           },
           success: function(response) {
-            console.log("Access Token Response:", response);
             const accessToken = response.access_token;
-            sessionStorage.setItem('accessToken', accessToken); // Save token to session storage
+            sessionStorage.setItem('accessToken', accessToken);
             fetchUserTopArtistAndGenre(accessToken);
           },
           error: function(xhr, status, error) {
@@ -82,7 +80,6 @@
             "Authorization": "Bearer " + accessToken
           },
           success: function(response) {
-            console.log("API Response:", response);
             const mainGenreElement = $('#mainGenre');
             const artistContainer = $('#artist-container');
             const artistNameElement = $('#artistName');
@@ -118,10 +115,8 @@
       const logoutButton = document.getElementById("logout-button");
       if (logoutButton) {
         logoutButton.addEventListener("click", function() {
-          // Clear the access token from sessionStorage
           sessionStorage.removeItem("accessToken");
-          // Redirect the user to the landing page
-          window.location.href = "https://cyni0.github.io/website/index.html"; // Replace with the actual path to your landing page
+          window.location.href = "https://cyni0.github.io/website/index.html";
         });
       }
     });
