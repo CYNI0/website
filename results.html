@@ -7,10 +7,11 @@
   <link rel="stylesheet" href="ResultsPage.css">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
+<script>
  document.addEventListener("DOMContentLoaded", function() {
     var clientId = 'ceae01a497814f499f7aebd4830653cb'; // Replace with your actual client_id
     var clientSecret = '7a87df79d2744e1ab3ef79e6f1488f8d'; // Replace with your actual client_secret
-  const redirectUri = "https://cyni0.github.io/website/results.html";
+    const redirectUri = "https://cyni0.github.io/website/results.html";
 
     const urlParams = new URLSearchParams(window.location.search);
     const authCode = urlParams.get('code');
@@ -29,29 +30,29 @@
     }
 
     function exchangeCodeForToken(code) {
-    $.ajax({
-        url: "https://accounts.spotify.com/api/token",
-        type: "POST",
-        headers: {
-            "Authorization": "Basic " + btoa(clientId + ':' + clientSecret),
-            'Content-Type' : 'application/x-www-form-urlencoded'
-        },
-        data: {
-            grant_type: "authorization_code",
-            code: code,
-            redirect_uri: redirectUri
-        },
-        //changed code
-     success: function(response) {
-            console.log("Access Token Response:", response);
-            const accessToken = response.access_token;
-            fetchUserTopArtistAndGenre(accessToken);
-        },
-        error: function(xhr, status, error) {
-            console.error("Error exchanging code for token:", xhr.responseText || error);
-        }
-    });
-}
+        $.ajax({
+            url: "https://accounts.spotify.com/api/token",
+            type: "POST",
+            headers: {
+                "Authorization": "Basic " + btoa(clientId + ':' + clientSecret),
+                'Content-Type' : 'application/x-www-form-urlencoded'
+            },
+            data: {
+                grant_type: "authorization_code",
+                code: code,
+                redirect_uri: redirectUri
+            },
+         success: function(response) {
+                console.log("Access Token Response:", response);
+                const accessToken = response.access_token;
+                fetchUserTopArtistAndGenre(accessToken);
+            },
+            error: function(xhr, status, error) {
+                console.error("Error exchanging code for token:", xhr.responseText || error);
+            }
+        });
+    }
+
     function fetchUserTopArtistAndGenre(accessToken) {
         $.ajax({
             url: "https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=1",
@@ -91,7 +92,17 @@
             }
         });
     }
+
+    // Logout button functionality
+    document.getElementById("logout-button").addEventListener("click", function() {
+        // Clear the access token from sessionStorage
+        sessionStorage.removeItem("accessToken");
+        // Redirect the user to the landing page
+        window.location.href = "https://cyni0.github.io/website/index.html"; // Replace with the actual path to your landing page
+    });
 });
+</script>
+
 </script>
 </head>
 <body>
